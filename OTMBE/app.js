@@ -1,7 +1,7 @@
 var ex=require("express")
 var fs=require('fs')
 var path=require('path')
-var util = require("util");
+var util = require("util")
 var promise=require("bluebird")
 var options = {
     // Initialization Options
@@ -13,8 +13,6 @@ var app=new ex();
 
 var connectionString = 'postgres://postgres:iluVirat100@localhost:5432/OTM';
 var db = pgp(connectionString);
-
-var query="";
 
 app.use(ex.static(path.join(__dirname, 'public'))); 
 app.use(bp.urlencoded({ extended: true }));
@@ -39,38 +37,44 @@ app.use(function (req, res, next) {
 });
 
 app.get('/',function(req,res,next){
-    var fn="EQuries.sql";
-    var contents="";
+    var EQuires="";
+    //Check if its Initialized once or not
     if (fs.existsSync("EQuries.sql")) {
-        console.log('File Exists');
+        EQuires=fs.readFileSync('EQuries.sql').toString();
+        console.log('Re-Initialization Initiated');
+    }else{
+        console.log('Initialization Initiated');
+        db.any("Create table DomainLogs(LogId SERIAL Primary Key,LogHeader text,LogCode text,LogType text,Message text,ReferenceId integer,LoggedFor text,CreationTime DATE NOT NULL DEFAULT CURRENT_DATE,ModifiedTime DATE NOT NULL,Status boolean);"+
+        "insert into DomainLogs(LogHeader,LogCode,LogType,Message,LoggedFor,Status) values ('Table-Creation:DomainLogs','CTR','INFO','Creation of DOMAINLOGS Table successfull','DomainLogs',True);")
+        .then(function (data) {
+        console.log(data);
+        });
+        console.log('Initialization Processed');
     }
-    fs.readFile("../Quries.sql", 'utf8',function (err,data) {
-        if (err) {
-            console.log(err);
-            process.exit(1);
-        }
-        query = util.format(data);
-        //query.replace('\n',' ');
-        //console.log(query);
-    });
-    fs.readFile(fn, 'utf8', function(err, data) {
-        contents=data;        
-    if(contents!=query){
-    db.any(query)
-    .then(function (data) {
+     
+    //Creation Of Tables
+    var Quires=fs.readFileSync('../Quries.sql').toString();   
+    Quires.replace('\n',' ');
+    if(Quires!=EQuires){
+        var drop=fs.readFileSync('../Drop.sql').toString();  
+        drop.replace('\n',' ');
+        db.any(drop)
+        .then(function (data) {
+        console.log(data);
+        })
+        db.any(Quires)
+        .then(function (data) {
         console.log('Tables Created');
-        fs.writeFile(fn,query,'utf8',(err) => {
+        fs.writeFile('EQuries.sql',Quires,'utf8',(err) => {
             if(err)
                 console.log(err)
         });
-        //fs.close();
-        console.log('Initialization Successfull');
+        console.log('Successfully Initialized');
         res.send(data);
     });   
     }else{
-        console.log('Re-Initialization Successfull');
+        console.log('No Re-Initialization Required');
     }
-    });
 });
 
 app.get('/courses',function(req,res,next){
