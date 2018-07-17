@@ -41,13 +41,16 @@ app.use(function (req, res, next) {
 app.get('/',function(req,res,next){
     var fn="EQuries.sql";
     var contents="";
+    if (fs.existsSync("EQuries.sql")) {
+        console.log('File Exists');
+    }
     fs.readFile("../Quries.sql", 'utf8',function (err,data) {
         if (err) {
             console.log(err);
             process.exit(1);
         }
         query = util.format(data);
-        query.replace('\n','');
+        //query.replace('\n',' ');
         //console.log(query);
     });
     fs.readFile(fn, 'utf8', function(err, data) {

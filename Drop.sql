@@ -1,0 +1,12 @@
+DROP Table IF EXISTS TestDetails CASCADE;
+insert into DomainLogs(LogHeader,LogCode,LogType,Message,LoggedFor,Status) values ('Table-Deletion:TestDetails','DTR','INFO','Deletion of TESTDETAILS Table successfull','TestDetails',true);
+DROP Table IF EXISTS Tests CASCADE;
+insert into DomainLogs(LogHeader,LogCode,LogType,Message,LoggedFor,Status) values ('Table-Deletion:Tests','DTR','INFO','Deletion of TESTS Table successfull','Tests',true);
+DROP Table IF EXISTS Questions CASCADE;
+insert into DomainLogs(LogHeader,LogCode,LogType,Message,LoggedFor,Status) values ('Table-Deletion:Questions','DTR','INFO','Deletion of QUESTIONS Table successfull','Questions',true);
+DROP Table IF EXISTS Courses CASCADE;
+insert into DomainLogs(LogHeader,LogCode,LogType,Message,LoggedFor,Status) values ('Table-Deletion:Courses','DTR','INFO','Deletion of COURSES Table successfull','Courses',true);
+DROP Table IF EXISTS Roles CASCADE;
+insert into DomainLogs(LogHeader,LogCode,LogType,Message,LoggedFor,Status) values ('Table-Deletion:Roles','DTR','INFO','Deletion of ROLES Table successfull','Roles',true);
+DROP Table IF EXISTS Users CASCADE;
+insert into DomainLogs(LogHeader,LogCode,LogType,Message,LoggedFor,Status) values ('Table-Deletion:Users','DTR','INFO','Deletion of USERS Table successfull','Users',true);
