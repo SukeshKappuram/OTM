@@ -51,4 +51,4 @@ begin
 exception when others then 
     insert into DomainLogs(LogHeader,LogCode,LogType,Message,LoggedFor,Status) values ('Table-Creation:TestDetails','CTR','WARN','Creation of TESTDETAILS Table Unsuccessfull','TestDetails',False);
 end;
-$$ language 'plpgsql'; 
+$$ language 'plpgsql';
