@@ -9,6 +9,7 @@ var options = {
 };
 var pgp = require('pg-promise')(options);
 var bp = require('body-parser');
+var mail= require('./mailer');
 var app=new ex();
 
 var connectionString = 'postgres://postgres:iluVirat100@localhost:5432/OTM';
@@ -44,8 +45,8 @@ app.get('/',function(req,res,next){
         console.log('Re-Initialization Initiated');
     }else{
         console.log('Initialization Initiated');
-        db.any("Create table DomainLogs(LogId SERIAL Primary Key,LogHeader text,LogCode text,LogType text,Message text,ReferenceId integer,LoggedFor text,CreationTime DATE NOT NULL DEFAULT CURRENT_DATE,ModifiedTime DATE NOT NULL,Status boolean);"+
-        "insert into DomainLogs(LogHeader,LogCode,LogType,Message,LoggedFor,Status) values ('Table-Creation:DomainLogs','CTR','INFO','Creation of DOMAINLOGS Table successfull','DomainLogs',True);")
+        var initQuery=fs.readFileSync('../init_proj.sql').toString();
+        db.any(initQuery)
         .then(function (data) {
         console.log(data);
         });
@@ -60,85 +61,23 @@ app.get('/',function(req,res,next){
         drop.replace('\n',' ');
         db.any(drop)
         .then(function (data) {
-        console.log(data);
-        })
-        db.any(Quires)
-        .then(function (data) {
-        console.log('Tables Created');
-        fs.writeFile('EQuries.sql',Quires,'utf8',(err) => {
+            console.log(data);
+            db.any(Quires)
+            .then(function (data) {
+            console.log('Tables Created');
+            fs.writeFile('EQuries.sql',Quires,'utf8',(err) => {
             if(err)
                 console.log(err)
+            });
+            console.log('Successfully Initialized');
         });
-        console.log('Successfully Initialized');
         res.send(data);
     });   
     }else{
         console.log('No Re-Initialization Required');
     }
+    mail('iamsukeshk@gmail.com','OTM Initialized');
 });
-
-app.get('/courses',function(req,res,next){
-    db.any('select * from courses')
-    .then(function (data) {
-        console.log(data);
-        res.send(data);
-    })
-})
-
-app.get('/courses/:id',function(req,res,next){
-    var i=parseInt(req.params.id)
-    db.any('select * from courses where id=$1',i)
-    .then(function (data) {
-        console.log(data);
-        res.send(data);
-    })
-})
-
-app.post('/courses/',function(req,res,next){
-    var n=req.body.name;
-    var d=req.body.duration;
-    var c=req.body.cou_content;
-    var m=req.body.cou_img;
-    var s=true;
-    var dt = new Date();
-    var fn = dt.getFullYear().toString()+'-' + dt.getMonth().toString()+'-' + dt.getDate().toString() +'-'+ dt.getMilliseconds().toString() + '.png';
-        fs.writeFile('./public/'+fn,m,'base64', (err) => {
-        if(err)
-        console.log(err)
-        else{
-            console.log('Image Svaed Success...');
-        }
-    });
-
-    imgPath = 'http://localhost:3400/' + fn;
-    db.none('insert into courses(name,duration,cou_content,cou_img,status) values($1,$2,$3,$4,$5)',[n,d,c,m,s])
-    .then(function () {
-        res.send({"msg":"Course added Successfully"});
-    })
-})
-
-
-app.put('/courses',function(req,res,next){
-    var i=req.body.id;
-    var n=req.body.name;
-    var d=req.body.duration;
-    var c=req.body.cou_content;
-    var m=req.body.cou_img;
-    var s=req.body.satus;
-    db.none("update courses set duration=$1,cou_content=$2,status=$3 where id=$4",[d,c,s,i])
-    .then(function(){
-        res.send("Course Updated Successfully");
-    })
-})
-
-
-app.delete('/courses/:id',function(req,res,next){
-    var i=req.params.id;
-    db.none("delete from courses where id=$1",i)
-    .then(function(){
-        res.send("Course deleted Successfully");
-    })
-})
 
 app.listen(3400,function(err){
     if(err){
